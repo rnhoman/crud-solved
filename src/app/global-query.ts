@@ -2,28 +2,33 @@ import gql from 'graphql-tag'
 
 export const createClient = gql`
 mutation createClient (
-    $company: String
+    $company: String,
+    $client_alias: String
 ){
     createClient( data: {
-        company: $company
+        company: $company,
+        client_alias: $client_alias
     }) {
         company
+        client_alias
     }
 }`
 
 export const updateClient = gql`
 mutation updateClient (
-    $id: Int!, $company: String
+    $id: Int!, $company: String, $client_alias: String
     ) {
     updateClient(
         where: {
             id: $id
         }, 
         data: {
-            company: $company
+            company: $company,
+            client_alias: $client_alias
         }
     ) {
         company
+        client_alias
     }
 }`
 
@@ -38,5 +43,6 @@ mutation deleteClient (
     ) {
         id
         company
+        client_alias
     }
 }`

@@ -11,16 +11,18 @@
               <tr>
                 <th>#</th>
                 <th>Company</th>
+                <th>Company Alias</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let cl of clients_array; let i=index">
+              <tr *ngFor="let item of clients_array; let i=index">
                 <td>{{ i+1 }}</td>
-                <td>{{ cl.company }}</td>
+                <td>{{ item.company }}</td>
+                <td>{{ item.client_alias }}</td>
                 <td>
-                  <button type="button" class="btn btn-primary btn-xs" (click)="showUpdateClient(cl, template)"><span class="glyphicon glyphicon-pencil"></span></button> | 
-                  <button type="button" class="btn btn-danger btn-xs" (click)="deleteClient(cl.id)"><span class="glyphicon glyphicon-trash"></span></button> | 
+                  <button type="button" class="btn btn-primary btn-xs" (click)="showUpdateClient(item, template)"><span class="glyphicon glyphicon-pencil"></span></button> | 
+                  <button type="button" class="btn btn-danger btn-xs" (click)="deleteClient(item.id)"><span class="glyphicon glyphicon-trash"></span></button> | 
                   <button type="button" class="btn btn-info btn-xs"><span class="glyphicon glyphicon-eye-open"></span></button>
                 </td>
               </tr>
@@ -47,12 +49,16 @@
       <div class="modal-body">
         <div class="form-group">
           <label for="company">Nama Company</label>
-          <input type="text" class="form-control" name="company" placeholder="Company" [(ngModel)]="company">
+          <input type="text" class="form-control" name="company" placeholder="Company" [(ngModel)]="cl.company">
+        </div>
+        <div class="form-group">
+          <label for="client_alias">Company Alias</label>
+          <input type="text" class="form-control" name="client_alias" placeholder="Company Alias" [(ngModel)]="cl.client_alias">
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success" *ngIf="!cl.id" (click)="createClient(company);">Create</button>
-        <button type="button" class="btn btn-primary" *ngIf="cl.id" (click)="updateClient(company);">Update</button>
+        <button type="button" class="btn btn-success" *ngIf="!cl.id" (click)="createClient(cl);">Create</button>
+        <button type="button" class="btn btn-primary" *ngIf="cl.id" (click)="updateClient(cl);">Update</button>
       </div>
     </form>
   </ng-template>

@@ -16,15 +16,16 @@ import Swal from 'sweetalert2';
 export class AppComponent {
 
   modalref: BsModalRef;
-  public clients_array: Array<any>=[];
+  public clients_array: Array<any> = [];
   // public link_null: string;
   // title = 'project1';
 
   //clients company
-  cl: any={};
+  cl: any = {};
   company: any;
+  client_alias: any;
 
-  constructor(private apollo: Apollo, private modalService:BsModalService)
+  constructor(private apollo: Apollo, private modalService: BsModalService )
   {}
 
   ngOnInit(){
@@ -32,11 +33,12 @@ export class AppComponent {
   }
 
   getAllCompanyClients(){
-    const getCompanyClients= gql`
+    const getCompanyClients = gql`
     {
       clients(orderBy: company_ASC) {
         id
         company
+        client_alias
       }
     }`;
     this.apollo.watchQuery({
@@ -44,26 +46,31 @@ export class AppComponent {
       fetchPolicy: 'network-only'
     })
     .valueChanges
-    .pipe(map((result: any)=> result.data.clients))
-    .subscribe((data)=> {
-      this.clients_array=data;
+    .pipe(map((result: any) => result.data.clients))
+    .subscribe((data) => {
+      this.clients_array = data;
     })
   }
-  createClient(value){
-    this.apollo
+  testcreate(){
+    console.log('Hallo');
+    // console.log();
+  }
+  createClient(cl){
+    return this.apollo
     .mutate({
       mutation: createClient,
       variables: {
-        company: value
+        company: cl.company,
+        client_alias: cl.client_alias
       },
-      update: (proxy, {data: {createClient}})=> {
-        const data: any = proxy.readQuery({ query:createClient.clients_array });
+      update: (proxy, {data: { createClient }}) => {
+        const data: any = proxy.readQuery({ query: createClient.clients_array });
         data.client.push(createClient);
         proxy.writeQuery({ query: createClient.clients_array, data });
       }
     })
     .subscribe(({ data }) => {
-      // console.log(data);
+      console.log(data);
       this.closeModal();
       this.getAllCompanyClients();
       Swal.fire(
@@ -78,25 +85,35 @@ export class AppComponent {
     })
   }
   
+  //untuk mengecek data yang di update
+ test(){
+   console.log(this.company);
+   console.log(this.client_alias);
+ } 
   updateClient(cl){
+    // console.log(cl);
     this.apollo
     .mutate({
       mutation: updateClient,
       variables: {
         id: this.cl.id,
-        company: cl
+        company: this.cl.company,
+        client_alias: this.cl.client_alias
       },
-      update: (proxy, {data: {updateClient} } ) => {
-        const data: any= proxy.readQuery({query: updateClient.clients_array});
+      update: (proxy, {data: { updateClient } } ) => {
+        const data: any = proxy.readQuery({query: updateClient.clients_array});
 
-        var index = data.clients_array.map(function (x) {return x.id;}).indexOf(this.cl.id);
+        var index = data.clients_array.map( function (x) { return x.id; } ).indexOf(this.cl.id);
 
         data.clients_array[index].company =cl;
+        data.clients_array[index].client_alias =cl;
+        // console.log(cl);
 
         proxy.writeQuery({ query: this.clients_array, data });
       }
     })
     .subscribe(({ data }) => {
+      console.log(this.cl);
       this.closeModal();
       this.getAllCompanyClients();
       Swal.fire(
@@ -123,7 +140,7 @@ export class AppComponent {
       update: (proxy, { data: { deleteClient } }) => {
         const data: any = proxy.readQuery({ query: deleteClient.clients_array });
 
-        var index = data.clients_array.map(function (x) { return x.id; }).indexOf(id);
+        var index = data.clients_array.map( function (x) { return x.id; }).indexOf(id);
 
         data.clients_array.splice(index, 1);
 
@@ -149,6 +166,7 @@ export class AppComponent {
 
   showUpdateClient(cl, template){
     this.company = cl.company;
+    this.client_alias = cl.client_alias;
     this.cl = cl;
     this.modalref = this.modalService.show(template)
   }
